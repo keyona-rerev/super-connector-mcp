@@ -134,6 +134,19 @@ async def sc_update_initiative_status(initiative_id: str, status: str) -> str:
         return _err(e)
 
 
+@mcp.tool(name="sc_delete_initiative", annotations={"readOnlyHint": False, "destructiveHint": True})
+async def sc_delete_initiative(initiative_id: str) -> str:
+    """Permanently delete an initiative by ID. Use for removing duplicates or retired initiatives.
+
+    Args:
+        initiative_id: The initiative ID to delete (e.g. 'INI-1775079223973674')
+    """
+    try:
+        return _ok(await _delete(f"/initiative/{initiative_id}"))
+    except Exception as e:
+        return _err(e)
+
+
 # ════════════════════════════════════════════════════════════════════════════
 # SUB-PROJECTS
 # ════════════════════════════════════════════════════════════════════════════
@@ -179,6 +192,19 @@ async def sc_list_sub_projects(initiative_id: str) -> str:
     """List all sub-projects for a given initiative."""
     try:
         return _ok(await _get(f"/initiative/{initiative_id}/sub-projects"))
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(name="sc_delete_sub_project", annotations={"readOnlyHint": False, "destructiveHint": True})
+async def sc_delete_sub_project(sub_project_id: str) -> str:
+    """Permanently delete a sub-project by ID.
+
+    Args:
+        sub_project_id: The sub-project ID to delete (e.g. 'SUB-1234567890')
+    """
+    try:
+        return _ok(await _delete(f"/sub-project/{sub_project_id}"))
     except Exception as e:
         return _err(e)
 
@@ -255,6 +281,19 @@ async def sc_upsert_contact(
             "notes": notes,
         }
         return _ok(await _post("/contact", body))
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(name="sc_delete_contact", annotations={"readOnlyHint": False, "destructiveHint": True})
+async def sc_delete_contact(contact_id: str) -> str:
+    """Permanently delete a contact by ID. Use with caution — this cannot be undone.
+
+    Args:
+        contact_id: The contact ID to delete (e.g. 'C1234567890')
+    """
+    try:
+        return _ok(await _delete(f"/contact/{contact_id}"))
     except Exception as e:
         return _err(e)
 
