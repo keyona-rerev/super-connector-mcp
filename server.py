@@ -530,6 +530,84 @@ async def sc_add_event_guest(
 
 
 # ════════════════════════════════════════════════════════════════════════════
+# CONTENT ASSETS
+# ════════════════════════════════════════════════════════════════════════════
+
+@mcp.tool(name="sc_log_content_idea", annotations={"readOnlyHint": False, "destructiveHint": False})
+async def sc_log_content_idea(
+    content_name: str,
+    venture: str,
+    content_type: Optional[str] = "Article",
+    notes: Optional[str] = "",
+    initiative_tags: Optional[str] = "",
+    activation_angle: Optional[str] = "",
+    asset_link: Optional[str] = "",
+) -> str:
+    """Log a content idea to the Super Connector assets registry. Status is always set to 'Idea'.
+    Use this whenever a content idea surfaces mid-session — article, LinkedIn post, campaign concept, etc.
+    Never let ideas live only in chat. Log them here immediately.
+
+    Args:
+        content_name: Short, clear name for the idea (e.g. 'ReRev article on AI audit for 10-person startups')
+        venture: ReRev Labs / Prismm / BTC / Sekhmetic / Internal
+        content_type: Article / Campaign Concept / Gifting Moment / Sequence Variant / Data Drop /
+                      Collab Hook / Case Study / Demo / Newsletter Issue / Event Recap
+        notes: 1-3 sentences capturing context, why it surfaced, and what the spark was
+        initiative_tags: Comma-separated initiative IDs if relevant (e.g. 'INI-004,INI-002')
+        activation_angle: The angle or hook this piece should use
+        asset_link: URL if a draft or reference already exists
+    """
+    try:
+        body = {
+            "content_name": content_name,
+            "content_type": content_type,
+            "venture": venture,
+            "status": "Idea",
+            "notes": notes,
+            "initiative_tags": initiative_tags,
+            "activation_angle": activation_angle,
+            "asset_link": asset_link,
+        }
+        return _ok(await _post("/content", body))
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(name="sc_list_content_ideas", annotations={"readOnlyHint": True})
+async def sc_list_content_ideas(venture: Optional[str] = None, status: Optional[str] = "Idea") -> str:
+    """List content assets from the Super Connector registry.
+    Defaults to showing all Idea-status assets. Pass venture to filter by brand.
+    Pass status=None to see all statuses.
+
+    Args:
+        venture: Filter by venture — ReRev Labs / Prismm / BTC / Sekhmetic / Internal (optional)
+        status: Filter by status — Idea / Draft / In Review / Active / Archived (default: Idea)
+    """
+    try:
+        params = {}
+        if venture:
+            params["venture"] = venture
+        if status:
+            params["status"] = status
+        return _ok(await _get("/content", params=params))
+    except Exception as e:
+        return _err(e)
+
+
+@mcp.tool(name="sc_get_content_idea", annotations={"readOnlyHint": True})
+async def sc_get_content_idea(content_id: str) -> str:
+    """Fetch a single content asset by ID.
+
+    Args:
+        content_id: The content asset ID (e.g. 'C-1775324077811')
+    """
+    try:
+        return _ok(await _get(f"/content/{content_id}"))
+    except Exception as e:
+        return _err(e)
+
+
+# ════════════════════════════════════════════════════════════════════════════
 # HEALTH CHECK
 # ════════════════════════════════════════════════════════════════════════════
 
